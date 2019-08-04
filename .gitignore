@@ -3,4 +3,5 @@
 output/*
 .idea
 experiments/*
+models/*
 logs/*
