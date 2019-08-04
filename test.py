@@ -1,5 +1,6 @@
 import argparse
 import os
+import random
 import torch
 import torch.nn as nn
 from PIL import Image
@@ -147,20 +148,20 @@ for content_path in content_paths:
         save_image(output, output_name)
 
     else:  # process one content and one style
-        for style_path in style_paths:
-            content = content_tf(Image.open(content_path))
-            style = style_tf(Image.open(style_path))
-            if args.preserve_color:
-                style = coral(style, content)
-            style = style.to(device).unsqueeze(0)
-            content = content.to(device).unsqueeze(0)
-            with torch.no_grad():
-                output = style_transfer(vgg, decoder, content, style,
-                                        args.alpha)
-            output = output.cpu()
-
-            output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
-                args.output, splitext(basename(content_path))[0],
-                splitext(basename(style_path))[0], args.save_ext
-            )
-            save_image(output, output_name)
+        #for style_path in style_paths:
+        style_path = random.choice(style_paths)
+        content = content_tf(Image.open(content_path))
+        style = style_tf(Image.open(style_path))
+        if args.preserve_color:
+            style = coral(style, content)
+        style = style.to(device).unsqueeze(0)
+        content = content.to(device).unsqueeze(0)
+        with torch.no_grad():
+            output = style_transfer(vgg, decoder, content, style,
+                                    args.alpha)
+        output = output.cpu()
+        output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
+            args.output, splitext(basename(content_path))[0],
+            splitext(basename(style_path))[0], args.save_ext
+        )
+        save_image(output, output_name)

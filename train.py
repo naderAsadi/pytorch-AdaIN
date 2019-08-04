@@ -8,7 +8,6 @@ from PIL import Image
 from PIL import ImageFile
 from tensorboardX import SummaryWriter
 from torchvision import transforms
-from tqdm import tqdm
 
 import net
 from sampler import InfiniteSamplerWrapper
@@ -70,6 +69,7 @@ parser.add_argument('--log_dir', default='./logs',
 parser.add_argument('--lr', type=float, default=1e-4)
 parser.add_argument('--lr_decay', type=float, default=5e-5)
 parser.add_argument('--max_iter', type=int, default=160000)
+parser.add_argument('--trained_iter', type=int, default=0)
 parser.add_argument('--batch_size', type=int, default=8)
 parser.add_argument('--style_weight', type=float, default=10.0)
 parser.add_argument('--content_weight', type=float, default=1.0)
@@ -112,7 +112,7 @@ style_iter = iter(data.DataLoader(
 
 optimizer = torch.optim.Adam(network.decoder.parameters(), lr=args.lr)
 
-for i in tqdm(range(args.max_iter)):
+for i in range(args.train_iter, args.max_iter):
     adjust_learning_rate(optimizer, iteration_count=i)
     content_images = next(content_iter).to(device)
     style_images = next(style_iter).to(device)
@@ -127,6 +127,9 @@ for i in tqdm(range(args.max_iter)):
 
     writer.add_scalar('loss_content', loss_c.item(), i + 1)
     writer.add_scalar('loss_style', loss_s.item(), i + 1)
+
+    if i % 1000 == 0 and i != 0:
+        print('Iter: {} - Loss Content: {} - Loss Style: {}'.format(i, loss_c.item(), loss_s.item()))
 
     if (i + 1) % args.save_model_interval == 0 or (i + 1) == args.max_iter:
         state_dict = net.decoder.state_dict()
