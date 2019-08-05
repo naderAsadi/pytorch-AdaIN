@@ -138,4 +138,5 @@ for i in range(args.trained_iter, args.max_iter):
         torch.save(state_dict,
                    '{:s}/decoder_iter_{:d}.pth.tar'.format(args.save_dir,
                                                            i + 1))
+        print('====> Model Saved')
 writer.close()
