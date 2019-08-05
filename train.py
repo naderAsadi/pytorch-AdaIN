@@ -112,7 +112,7 @@ style_iter = iter(data.DataLoader(
 
 optimizer = torch.optim.Adam(network.decoder.parameters(), lr=args.lr)
 
-for i in range(args.train_iter, args.max_iter):
+for i in range(args.trained_iter, args.max_iter):
     adjust_learning_rate(optimizer, iteration_count=i)
     content_images = next(content_iter).to(device)
     style_images = next(style_iter).to(device)
