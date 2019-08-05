@@ -128,7 +128,7 @@ for i in range(args.trained_iter, args.max_iter):
     writer.add_scalar('loss_content', loss_c.item(), i + 1)
     writer.add_scalar('loss_style', loss_s.item(), i + 1)
 
-    if i % 1000 == 0 and i != 0:
+    if i % 1000 == 0:
         print('Iter: {} - Loss Content: {} - Loss Style: {}'.format(i, loss_c.item(), loss_s.item()))
 
     if (i + 1) % args.save_model_interval == 0 or (i + 1) == args.max_iter:
