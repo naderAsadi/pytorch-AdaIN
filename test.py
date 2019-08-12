@@ -59,10 +59,10 @@ parser.add_argument('--vgg', type=str, default='models/vgg_normalised.pth')
 parser.add_argument('--decoder', type=str, default='models/decoder_iter_60000_p_a.pth.tar')
 
 # Additional options
-parser.add_argument('--content_size', type=int, default=256,
+parser.add_argument('--content_size', type=int, default=75,
                     help='New (minimum) size for the content image, \
                     keeping the original size if set to 0')
-parser.add_argument('--style_size', type=int, default=256,
+parser.add_argument('--style_size', type=int, default=75,
                     help='New (minimum) size for the style image, \
                     keeping the original size if set to 0')
 parser.add_argument('--crop', action='store_true',
@@ -148,20 +148,21 @@ for content_path in content_paths:
         save_image(output, output_name)
 
     else:  # process one content and one style
-        #for style_path in style_paths:
-        style_path = random.choice(style_paths)
-        content = content_tf(Image.open(content_path))
-        style = style_tf(Image.open(style_path))
-        if args.preserve_color:
-            style = coral(style, content)
-        style = style.to(device).unsqueeze(0)
-        content = content.to(device).unsqueeze(0)
-        with torch.no_grad():
-            output = style_transfer(vgg, decoder, content, style,
-                                    args.alpha)
-        output = output.cpu()
-        output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
-            args.output, splitext(basename(content_path))[0],
-            splitext(basename(style_path))[0], args.save_ext
-        )
-        save_image(output, output_name)
+        for style_path in style_paths:
+        #style_path = random.choice(style_paths)
+            content = content_tf(Image.open(content_path))
+            style = style_tf(Image.open(style_path))
+            if args.preserve_color:
+                style = coral(style, content)
+            style = style.to(device).unsqueeze(0)
+            content = content.to(device).unsqueeze(0)
+            with torch.no_grad():
+                output = style_transfer(vgg, decoder, content, style,
+                                        args.alpha)
+            output = output.cpu()
+            output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
+                args.output, splitext(basename(content_path))[0],
+                splitext(basename(style_path))[0], args.save_ext
+            )
+            print(content_path[:-4] + '_1' + args.save_ext)
+            save_image(output, content_path[:-4] + '_1' + args.save_ext)
