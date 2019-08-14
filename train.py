@@ -19,8 +19,8 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True  # Disable OSError: image file is truncat
 
 def train_transform():
     transform_list = [
-        transforms.Resize(size=(75, 75)),
-        transforms.RandomCrop(60),
+        transforms.Resize(size=(256, 256)),
+        transforms.RandomCrop(128),
         transforms.ToTensor()
     ]
     return transforms.Compose(transform_list)
@@ -68,7 +68,7 @@ parser.add_argument('--log_dir', default='./logs',
                     help='Directory to save the log')
 parser.add_argument('--lr', type=float, default=1e-4)
 parser.add_argument('--lr_decay', type=float, default=5e-5)
-parser.add_argument('--max_iter', type=int, default=160000)
+parser.add_argument('--max_iter', type=int, default=300000)
 parser.add_argument('--trained_iter', type=int, default=0)
 parser.add_argument('--batch_size', type=int, default=8)
 parser.add_argument('--style_weight', type=float, default=10.0)

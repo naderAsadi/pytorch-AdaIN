@@ -56,7 +56,7 @@ parser.add_argument('--style', type=str,
 parser.add_argument('--style_dir', type=str,
                     help='Directory path to a batch of style images')
 parser.add_argument('--vgg', type=str, default='models/vgg_normalised.pth')
-parser.add_argument('--decoder', type=str, default='models/decoder_iter_60000_p_a.pth.tar')
+parser.add_argument('--decoder', type=str, default='models/decoder_iter_280000_photo2all_75.pth.tar')
 
 # Additional options
 parser.add_argument('--content_size', type=int, default=75,
