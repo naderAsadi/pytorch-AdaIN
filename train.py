@@ -8,6 +8,7 @@ from PIL import Image
 from PIL import ImageFile
 from tensorboardX import SummaryWriter
 from torchvision import transforms
+import torchvision
 
 import net
 from sampler import InfiniteSamplerWrapper
@@ -104,11 +105,11 @@ style_dataset = FlatFolderDataset(args.style_dir, style_tf)
 content_iter = iter(data.DataLoader(
     content_dataset, batch_size=args.batch_size,
     sampler=InfiniteSamplerWrapper(content_dataset),
-    num_workers=args.n_threads, shuffle=True))
+    num_workers=args.n_threads))
 style_iter = iter(data.DataLoader(
     style_dataset, batch_size=args.batch_size,
     sampler=InfiniteSamplerWrapper(style_dataset),
-    num_workers=args.n_threads, shuffle=True))
+    num_workers=args.n_threads))
 
 optimizer = torch.optim.Adam(network.decoder.parameters(), lr=args.lr)
 
@@ -116,6 +117,7 @@ for i in range(args.trained_iter, args.max_iter):
     adjust_learning_rate(optimizer, iteration_count=i)
     content_images = next(content_iter).to(device)
     style_images = next(style_iter).to(device)
+    
     loss_c, loss_s = network(content_images, style_images)
     loss_c = args.content_weight * loss_c
     loss_s = args.style_weight * loss_s
