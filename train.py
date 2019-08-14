@@ -104,11 +104,11 @@ style_dataset = FlatFolderDataset(args.style_dir, style_tf)
 content_iter = iter(data.DataLoader(
     content_dataset, batch_size=args.batch_size,
     sampler=InfiniteSamplerWrapper(content_dataset),
-    num_workers=args.n_threads))
+    num_workers=args.n_threads, shuffle=True))
 style_iter = iter(data.DataLoader(
     style_dataset, batch_size=args.batch_size,
     sampler=InfiniteSamplerWrapper(style_dataset),
-    num_workers=args.n_threads))
+    num_workers=args.n_threads, shuffle=True))
 
 optimizer = torch.optim.Adam(network.decoder.parameters(), lr=args.lr)
 
