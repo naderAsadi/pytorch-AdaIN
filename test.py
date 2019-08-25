@@ -156,6 +156,8 @@ for content_path in content_paths:
                 style = coral(style, content)
             style = style.to(device).unsqueeze(0)
             content = content.to(device).unsqueeze(0)
+            print(style.shape)
+            print(content.shape)
             with torch.no_grad():
                 output = style_transfer(vgg, decoder, content, style,
                                         args.alpha)
