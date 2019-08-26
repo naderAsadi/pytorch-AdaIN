@@ -28,7 +28,7 @@ parser.add_argument('--style', type=str,
 parser.add_argument('--style_dir', type=str,
                     help='Directory path to a batch of style images')
 parser.add_argument('--vgg', type=str, default='models/vgg_normalised.pth')
-parser.add_argument('--decoder', type=str, default='models/notart2art_225_2x_decoder_iter_110000.pth.tar')
+parser.add_argument('--decoder', type=str, default='models/notart2art_256_2x_decoder_iter_130000.pth.tar')
 
 # Additional options
 parser.add_argument('--content_size', type=int, default=225,
@@ -102,11 +102,11 @@ def resize_tile(content, img_size):
 
     return content
 
-def transfer(image):
+def transfer(image, alpha=args.alpha):
     style = style_tf(Image.open(random.choice(style_paths)))
     style = style.to(device).unsqueeze(0)
     with torch.no_grad():
-        output = style_transfer(vgg, decoder, image.to(device), style, args.alpha)
+        output = style_transfer(vgg, decoder, image.to(device), style, alpha=alpha)
     output = output.cpu()
     return output
 
@@ -117,13 +117,16 @@ def augment(content, grid_size, img_size):
         tiles[n] = get_tile(content, n, grid_size=grid_size)
 
     # Style whole image
-    output_whole = transfer(content)
+    for i in range(5):
+        output_whole = transfer(content, alpha=0.9)
+        name = content_path[:-4] + '_trans' + str(i) + content_path[-4:]
+        torchvision.utils.save_image(output_whole.data, name)
     
     # Style each tile
     i = 0
     for tile in tiles:
         tile = resize_tile(tile, img_size = img_size).unsqueeze(0)
-        for j in range(3):
+        for j in range(10):
             output = transfer(tile)
             output = resize_tile(output, img_size=img_size//grid_size)
             name = content_path[:-4] + '_' + str(i) + '_' + str(j) + content_path[-4:]
@@ -131,8 +134,6 @@ def augment(content, grid_size, img_size):
         i += 1
     #tiles = torch.stack(tiles, 0)
     #tiles = torchvision.utils.make_grid(tiles, grid_size, padding=0)
-    name = content_path[:-4] + '_trans' + content_path[-4:]
-    torchvision.utils.save_image(output_whole.data, name)
     
     #print(content_path[:-4] + '_1' + args.save_ext)
     #save_image(output, content_path[:-4] + '_1' + args.save_ext)
