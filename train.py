@@ -69,8 +69,12 @@ parser.add_argument('--log_dir', default='./logs',
                     help='Directory to save the log')
 parser.add_argument('--lr', type=float, default=1e-4)
 parser.add_argument('--lr_decay', type=float, default=5e-5)
-parser.add_argument('--max_iter', type=int, default=300000)
+parser.add_argument('--max_iter', type=int, default=600000)
+
 parser.add_argument('--trained_iter', type=int, default=0)
+parser.add_argument('--continue_train', action='store_true', help='')
+parser.add_argument('--model_dir', type=str, default='saved_model.pth', help='Directory path to the pretrained model')
+
 parser.add_argument('--batch_size', type=int, default=8)
 parser.add_argument('--style_weight', type=float, default=2.0)
 parser.add_argument('--content_weight', type=float, default=1.0)
@@ -93,6 +97,11 @@ vgg = net.vgg
 vgg.load_state_dict(torch.load(args.vgg))
 vgg = nn.Sequential(*list(vgg.children())[:31])
 network = net.Net(vgg, decoder)
+
+if args.continue_train:
+    network.decoder.load_state_dict(torch.load(args.model_dir)['state_dict'])
+    print('Decoder loaded. Resuming the training process.')
+
 network.train()
 network.to(device)
 
