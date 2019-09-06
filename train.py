@@ -99,7 +99,7 @@ vgg = nn.Sequential(*list(vgg.children())[:31])
 network = net.Net(vgg, decoder)
 
 if args.continue_train:
-    network.decoder.load_state_dict(torch.load(args.model_dir)['state_dict'])
+    network.decoder.load_state_dict(torch.load(args.model_dir))
     print('Decoder loaded. Resuming the training process.')
 
 network.train()
