@@ -20,8 +20,8 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True  # Disable OSError: image file is truncat
 
 def train_transform():
     transform_list = [
-        transforms.Resize(size=(225, 225)),
-        transforms.RandomCrop(128),
+        transforms.Resize(size=(128, 128)),
+        transforms.RandomCrop(64),
         transforms.ToTensor()
     ]
     return transforms.Compose(transform_list)

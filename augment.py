@@ -28,7 +28,7 @@ parser.add_argument('--style', type=str,
 parser.add_argument('--style_dir', type=str,
                     help='Directory path to a batch of style images')
 parser.add_argument('--vgg', type=str, default='models/vgg_normalised.pth')
-parser.add_argument('--decoder', type=str, default='models/notcartoon_225_5x_decoder_iter_160000.pth.tar')
+parser.add_argument('--decoder', type=str, default='models/vlcs_labelme_decoder_iter_140000.pth.tar')
 
 # Additional options
 parser.add_argument('--content_size', type=int, default=225,
@@ -59,10 +59,11 @@ args = parser.parse_args()
 
 def test_transform(size, crop):
     transform_list = []
-    if size != 0:
-        transform_list.append(transforms.Resize(size))
+    #if size != 0:
+    #    transform_list.append(transforms.Resize(size))
     if crop:
         transform_list.append(transforms.CenterCrop(size))
+    transform_list.append(transforms.Resize([size, size]))
     transform_list.append(transforms.ToTensor())
     transform = transforms.Compose(transform_list)
     return transform
@@ -96,7 +97,7 @@ def resize_tile(content, img_size):
     content.squeeze_()
     content = transforms.Compose([
         transforms.ToPILImage(),
-        transforms.Resize(img_size),
+        transforms.Resize([img_size, img_size]),
         transforms.ToTensor()
     ])(content)
 
@@ -111,6 +112,7 @@ def transfer(image, alpha=args.alpha):
     return output
 
 def augment(content, grid_size, img_size):
+    #print(content.shape)
     n_grids = grid_size ** 2
     tiles = [None] * n_grids
     for n in range(n_grids):
@@ -125,8 +127,9 @@ def augment(content, grid_size, img_size):
     # Style each tile
     i = 0
     for tile in tiles:
+        #print(tile.shape)
         tile = resize_tile(tile, img_size = img_size).unsqueeze(0)
-        for j in range(10):
+        for j in range(5):
             output = transfer(tile)
             output = resize_tile(output, img_size=img_size//grid_size)
             name = content_path[:-4] + '_' + str(i) + '_' + str(j) + content_path[-4:]
@@ -171,7 +174,7 @@ decoder.to(device)
 grid_size = 3
 img_size = 225
 for content_path in content_paths:
-    content = content_tf(Image.open(content_path))
+    content = content_tf(Image.open(content_path).convert('RGB'))
     content = content.unsqueeze(0)
 
     augment(content, grid_size, img_size)
