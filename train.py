@@ -20,8 +20,8 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True  # Disable OSError: image file is truncat
 
 def train_transform():
     transform_list = [
-        transforms.Resize(size=(128, 128)),
-        transforms.RandomCrop(64),
+        transforms.Resize(size=(225, 225)),
+        transforms.RandomCrop(128),
         transforms.ToTensor()
     ]
     return transforms.Compose(transform_list)
@@ -122,6 +122,8 @@ style_iter = iter(data.DataLoader(
 
 optimizer = torch.optim.Adam(network.decoder.parameters(), lr=args.lr)
 
+avg_loss_c = 0
+avg_loss_s = 0
 for i in range(args.trained_iter, args.max_iter):
     adjust_learning_rate(optimizer, iteration_count=i)
     content_images = next(content_iter).to(device)
@@ -139,8 +141,11 @@ for i in range(args.trained_iter, args.max_iter):
     writer.add_scalar('loss_content', loss_c.item(), i + 1)
     writer.add_scalar('loss_style', loss_s.item(), i + 1)
 
+    avg_loss_c += loss_c.item()
+    avg_loss_s += loss_s.item()
+
     if i % 1000 == 0:
-        print('Iter: {} - Loss Content: {} - Loss Style: {}'.format(i, loss_c.item(), loss_s.item()))
+        print('Iter: {} - Loss Content: {} - Loss Style: {}'.format(i, avg_loss_c.item(), avg_loss_s.item()))
 
     if (i + 1) % args.save_model_interval == 0 or (i + 1) == args.max_iter:
         state_dict = net.decoder.state_dict()
