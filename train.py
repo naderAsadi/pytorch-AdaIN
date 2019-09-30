@@ -144,8 +144,10 @@ for i in range(args.trained_iter, args.max_iter):
     avg_loss_c += loss_c.item()
     avg_loss_s += loss_s.item()
 
-    if i % 1000 == 0:
-        print('Iter: {} - Loss Content: {} - Loss Style: {}'.format(i, avg_loss_c.item(), avg_loss_s.item()))
+    if i % 1000 == 0 and i != 0:
+        print('Iter: {} - Loss Content: {} - Loss Style: {}'.format(i, avg_loss_c / 1000, avg_loss_s / 1000))
+        avg_loss_c = 0
+        avg_loss_s = 0
 
     if (i + 1) % args.save_model_interval == 0 or (i + 1) == args.max_iter:
         state_dict = net.decoder.state_dict()
